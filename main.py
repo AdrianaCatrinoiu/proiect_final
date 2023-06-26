@@ -2,8 +2,9 @@ import os
 import datetime
 import sqlite3
 from sqlite3 import Error
-from database import create_database, validate_customer_id, generate_invoice, DATABASE_FILE
-from pdf_generator import generate_invoice
+from database import create_database, DATABASE_FILE
+from pdf_generator import generate_invoice,validate_customer_id
+
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -22,15 +23,17 @@ def print_main_menu():
 
 
 def add_customer():
-    global index_initial
-
+  
     print("Add a new customer")
     print("==================")
     name = input("Name: ")
     address = input("Address: ")
     phone = input("Phone: ")
-    index_initial = input("Index initial: ")
+    index_initial = 0
 
+    if len(phone) != 10:
+        print("Error: Phone number must contain 10 digits.")
+        return
     connexion = sqlite3.connect(DATABASE_FILE)
     c = connexion.cursor()
 
@@ -45,8 +48,7 @@ def add_customer():
 
 
 def add_index():
-    global index_initial
-
+ 
     print("Add index for a specific month")
     print("==============================")
 
@@ -57,7 +59,11 @@ def add_index():
 
     try:
         validate_customer_id(customer_id)
-        index_initial = c.execute("SELECT index_initial FROM customers where id = ?", (customer_id,)).fetchone()[0]
+        previous_index_final = c.execute("SELECT index_final FROM bills WHERE customer_id = ? ORDER BY id DESC LIMIT 1", (customer_id,)).fetchone()
+        if previous_index_final:
+            index_initial = previous_index_final[0]
+        else:
+            index_initial = c.execute("SELECT index_initial FROM customers WHERE id = ?", (customer_id,)).fetchone()[0]
     except ValueError as e:
         print(f"Error: {str(e)}")
         return
@@ -143,7 +149,3 @@ def main():
     print("Exiting the program.")
 if __name__ == "__main__":
     main()
-
-
-
- 
