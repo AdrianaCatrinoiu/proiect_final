@@ -1,10 +1,8 @@
 import os
 import datetime
 import sqlite3
-from sqlite3 import Error
 from database import create_database, DATABASE_FILE
-from pdf_generator import generate_invoice,validate_customer_id
-
+from pdf_generator import generate_invoice, validate_customer_id
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -18,37 +16,34 @@ def print_main_menu():
     print("4. Add index for a specific month")
     print("5. Exit")
 
-
 # CLI Functionality
-
-
 def add_customer():
-  
     print("Add a new customer")
     print("==================")
     name = input("Name: ")
     address = input("Address: ")
-    phone = input("Phone: ")
     index_initial = 0
 
-    if len(phone) != 10:
-        print("Error: Phone number must contain 10 digits.")
-        return
+    while True:
+        phone = input("Phone: ")
+        if len(phone) != 10:
+            print("Error: Phone number must contain 10 digits.")
+        else:
+            break
+
     connexion = sqlite3.connect(DATABASE_FILE)
     c = connexion.cursor()
 
-    c.execute("INSERT INTO customers (name, address, phone, index_initial) VALUES (?, ?, ?, ?)", (name, address, phone, index_initial))
+    c.execute("INSERT INTO customers (name, address, phone, index_initial) VALUES (?, ?, ?, ?)",
+              (name, address, phone, index_initial))
 
     connexion.commit()
     connexion.close()
 
     print("Customer added successfully.")
 
-
-
-
 def add_index():
- 
+
     print("Add index for a specific month")
     print("==============================")
 
@@ -59,7 +54,8 @@ def add_index():
 
     try:
         validate_customer_id(customer_id)
-        previous_index_final = c.execute("SELECT index_final FROM bills WHERE customer_id = ? ORDER BY id DESC LIMIT 1", (customer_id,)).fetchone()
+        previous_index_final = c.execute("SELECT index_final FROM bills WHERE customer_id = ? ORDER BY id DESC LIMIT 1",
+                                         (customer_id,)).fetchone()
         if previous_index_final:
             index_initial = previous_index_final[0]
         else:
@@ -75,9 +71,9 @@ def add_index():
     unit_price = input("Unit Price: ")
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-
-    c.execute("INSERT INTO bills (customer_id, month, year, index_initial, index_final, consumption, unit_price, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-              (customer_id, month, year, index_initial, index_final, consumption, unit_price, date))
+    c.execute(
+        "INSERT INTO bills (customer_id, month, year, index_initial, index_final, consumption, unit_price, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (customer_id, month, year, index_initial, index_final, consumption, unit_price, date))
     c.execute("UPDATE customers SET index_initial = ? where id = ?", (index_final, customer_id))
 
     connexion.commit()
@@ -85,22 +81,22 @@ def add_index():
 
     print("Index added successfully.")
 
+
 def main():
     create_database()
 
     while True:
         clear_screen()
         print_main_menu()
-
+        
         choice = input("Enter your choice: ")
 
         if choice == "1":
             add_customer()
 
         elif choice == "2":
-            customer_id = input("Customer ID: ")
+
             try:
-                validate_customer_id(customer_id)
                 while True:
                     clear_screen()
                     print("Customer Options")
@@ -122,7 +118,6 @@ def main():
                         break
                     else:
                         print("Invalid choice. Please try again.")
-                    input("Press Enter to continue...")
             except ValueError as e:
                 print(f"Error: {str(e)}")
 
@@ -144,8 +139,7 @@ def main():
         else:
             print("Invalid choice. Please try again.")
 
-        input("Press Enter to continue...")
-
     print("Exiting the program.")
+
 if __name__ == "__main__":
     main()
