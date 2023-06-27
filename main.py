@@ -4,6 +4,7 @@ import sqlite3
 from database import create_database, DATABASE_FILE
 from pdf_generator import generate_invoice, validate_customer_id
 
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -17,6 +18,7 @@ def print_main_menu():
     print("5. Exit")
 
 # CLI Functionality
+
 def add_customer():
     print("Add a new customer")
     print("==================")
@@ -41,6 +43,7 @@ def add_customer():
     connexion.close()
 
     print("Customer added successfully.")
+
 
 def add_index():
 
@@ -83,20 +86,22 @@ def add_index():
 
 
 def main():
+
     create_database()
 
     while True:
         clear_screen()
         print_main_menu()
-        
+
         choice = input("Enter your choice: ")
 
         if choice == "1":
             add_customer()
 
         elif choice == "2":
-
+            customer_id = input("Customer ID: ")
             try:
+                validate_customer_id(customer_id)
                 while True:
                     clear_screen()
                     print("Customer Options")
@@ -140,6 +145,7 @@ def main():
             print("Invalid choice. Please try again.")
 
     print("Exiting the program.")
+
 
 if __name__ == "__main__":
     main()
