@@ -4,7 +4,6 @@ from fpdf import FPDF
 from database import DATABASE_FILE
 
 def validate_customer_id(customer_id):
-
     connexion = sqlite3.connect(DATABASE_FILE)
     c = connexion.cursor()
 
@@ -15,10 +14,8 @@ def validate_customer_id(customer_id):
 
     if count == 0:
         raise ValueError("Invalid customer ID.")
-    
 
 def generate_invoice(customer_id, month, year):
-
     connexion = sqlite3.connect(DATABASE_FILE)
     c = connexion.cursor()
 
@@ -31,7 +28,9 @@ def generate_invoice(customer_id, month, year):
         raise ValueError("Invalid customer ID.")
 
     # Get consumption details
-    c.execute("SELECT index_initial, index_final, consumption, unit_price, date FROM bills WHERE customer_id=? AND month=? AND year=?", (customer_id, month, year))
+    c.execute(
+        "SELECT index_initial, index_final, consumption, unit_price, date FROM bills WHERE customer_id=? AND month=? AND year=?",
+        (customer_id, month, year))
     consumption_details = c.fetchone()
 
     if not consumption_details:
@@ -52,7 +51,7 @@ def generate_invoice(customer_id, month, year):
     pdf.cell(0, 10, txt=f"Customer Name: {customer[0]}", ln=True)
     pdf.cell(0, 10, txt=f"Address: {customer[1]}", ln=True)
     pdf.cell(0, 10, txt=f"Phone: {customer[2]}", ln=True, align="L")
-    
+
     pdf.ln(10)
 
     # Table
@@ -65,13 +64,13 @@ def generate_invoice(customer_id, month, year):
     pdf.cell(30, 10, "Total Amount", border=1)
     pdf.ln(10)
     pdf.set_font("Arial", "", 12)
-    pdf.cell(30, 10,  txt=f"{year}_{month}", border=1)
+    pdf.cell(30, 10, txt=f"{year}_{month}", border=1)
     pdf.cell(30, 10, str(consumption_details[3]), border=1)
     pdf.cell(30, 10, str(consumption_details[0]), border=1)
     pdf.cell(30, 10, str(consumption_details[1]), border=1)
     pdf.cell(30, 10, str(consumption_details[2]), border=1)
-    pdf.cell(30, 10, str(consumption_details[2]*consumption_details[3]), border=1)
-    
+    pdf.cell(30, 10, str(consumption_details[2] * consumption_details[3]), border=1)
+
     pdf.ln(50)
     pdf.cell(0, 10, txt=f"Date Generated Invoice: {consumption_details[4]}", ln=True)
 
@@ -85,4 +84,3 @@ def generate_invoice(customer_id, month, year):
     pdf.output(invoice_path)
 
     print(f"Invoice generated successfully: {invoice_path}")
-
