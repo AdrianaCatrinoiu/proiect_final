@@ -1,11 +1,14 @@
+from pathlib import Path
 import sqlite3
 
-DATABASE_FILE = "electricity_bills.db"
+
+DATABASE_PATH = Path("electricity_bills.db")
 
 """ Database Initialization"""
 
 def create_database():
-    connexion = sqlite3.connect(DATABASE_FILE)
+    """Create the SQLite database and the required tables if they don't exist."""
+    connexion = sqlite3.connect(DATABASE_PATH)
     c = connexion.cursor()
 
     # Create customers table
@@ -31,3 +34,4 @@ def create_database():
                     FOREIGN KEY (customer_id) REFERENCES customers(id))''')
     connexion.commit()
     connexion.close()
+
