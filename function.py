@@ -41,13 +41,6 @@ def add_index():
     c = connexion.cursor()
 
     customer_id = input("Customer ID: ")
-
-    # try:
-    #     validate_customer_id(customer_id)
-    #     index_initial = c.execute("SELECT index_initial FROM customers where id = ?", (customer_id,)).fetchone()[0]
-    # except ValueError as e:
-    #     print(f"Error: {str(e)}")
-    #     return
     try:
         validate_customer_id(customer_id)
         previous_index_final = c.execute("SELECT index_final FROM bills WHERE customer_id = ? ORDER BY id DESC LIMIT 1", (customer_id,)).fetchone()
