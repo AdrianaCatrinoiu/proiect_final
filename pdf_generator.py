@@ -78,7 +78,7 @@ def generate_invoice(customer_id, month, year):
     pdf.cell(0, 10, txt=f"Date Generated Invoice: {consumption_details[4]}", ln=True)
 
     
-    invoice_dir = Path(__file__).resolve().parent / "invoices"
+    invoice_dir = Path(__file__).parent / "invoices"
     invoice_dir.mkdir(exist_ok=True)
     invoice_filename = f"Invoice_{customer_id}_{month}_{year}.pdf"
     invoice_path = invoice_dir / invoice_filename
